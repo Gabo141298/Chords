@@ -1,9 +1,11 @@
 #include <iostream>
 
-using namespace std;
+#include "csvparser.h"
 
 int main()
 {
-    cout << "Hello World!" << endl;
+    std::cout << "Aún no hay nada hecho" << std::endl;
+    CsvParser parser;
+    parser.parseFile("One.txt");
     return 0;
 }
