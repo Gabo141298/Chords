@@ -1,3 +1,6 @@
+#include <cmath>
+#include <limits>
+
 #include "minimumhandmovement.h"
 
 int MinimumHandMovement::parseFile(std::string chordsFilename, std::string songFilename)
@@ -34,31 +37,28 @@ int MinimumHandMovement::parseFile(std::string chordsFilename, std::string songF
     return 0;
 }
 
-double MinimumHandMovement::FASE(int i, float dacum, float sigmaMin)
+double MinimumHandMovement::FASE(int i, double dacum)
 {
-    /* if (i >= n)
+     if (i >= n)
         return dacum;
-    cosa = ;
-    double dmin = DOUBLE.MAX;
 
-    for (int j = 0; j < 2; ++j)
+    double dmin = std::numeric_limits<double>::max();
+    std::vector<int> sigmaMin;
+
+    for (int j = 0; j < 3; ++j)
     {
-        sigme[i] = j;
-        float = FASE(i+1, dacum + chords[i-1][sigma[i-1]] - chords[i][j], sigmaMin);
+        sigma[i] = j;
+        double d = FASE(i+1, dacum + abs(chords[i - 1].chordShapes[sigma[i - 1]].centroid - chords[i].chordShapes[j].centroid));
 
-        if (d < min)
+        if (d < dmin)
         {
             dmin = d;
-            cosa = j;
+            sigmaMin = sigma;
         }
     }
 
-    sigma[i] = cosa;
+    sigma = sigmaMin;
     return dmin;
-
-    */
-
-    return 0;
 }
 
 double MinimumHandMovement::calculateMinimumHandMovement(std::string songFilename, std::string chordsfilename)

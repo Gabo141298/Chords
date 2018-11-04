@@ -9,7 +9,7 @@
 class MinimumHandMovement
 {
   private:
-    double FASE(int i, float dacum, float sigmaMin);
+    double FASE(int i, double dacum);
     int parseFile(std::string chordsFilename, std::string songFilename);
 
   public:
@@ -22,7 +22,7 @@ class MinimumHandMovement
         struct ChordShape
         {
             int offset;
-            float centroid;
+            double centroid;
         };
 
       public:
@@ -31,6 +31,8 @@ class MinimumHandMovement
     };
 
     std::vector<Chord> chords;
+    std::vector<int> sigma;
+    int n;
 };
 
 #endif // MINIMUMHANDMOVEMENT_H

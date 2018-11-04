@@ -1,7 +1,6 @@
 #include <iostream>
 #include <string>
 
-#include "csvparser.h"
 #include "minimumhandmovement.h"
 
 int main(int argc, char* argv[])
