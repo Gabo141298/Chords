@@ -4,9 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += main.cpp \
-    minimumhandmovement.cpp \
-    csvparser.cpp
+    minimumhandmovement.cpp
 
 HEADERS += \
-    minimumhandmovement.h \
-    csvparser.h
+    minimumhandmovement.h

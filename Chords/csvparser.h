@@ -1,12 +1,13 @@
 #ifndef CSVPARSER_H
 #define CSVPARSER_H
 
+#include <string>
 
 class CsvParser
 {
   public:
     CsvParser();
-    int parseFile(std::__cxx11::string file_name);
+    int parseFile(std::string songFilename, std::string chordsFilename);
 };
 
 #endif // CSVPARSER_H
