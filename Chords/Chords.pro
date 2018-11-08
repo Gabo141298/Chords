@@ -6,5 +6,4 @@ CONFIG -= qt
 SOURCES += main.cpp \
     minimumhandmovement.cpp
 
-HEADERS += \
-    minimumhandmovement.h
+HEADERS += minimumhandmovement.h

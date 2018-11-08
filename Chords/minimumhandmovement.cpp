@@ -3,31 +3,93 @@
 
 #include "minimumhandmovement.h"
 
-int MinimumHandMovement::parseFile(std::string chordsFilename, std::string songFilename)
+void MinimumHandMovement::calculateCentroid(ChordShape shape)
 {
-    // Creation of fstream class object
-    std::fstream buf;
+    int count = 0, acum = 0;
 
-    std::string line;
-
-    buf.open(chordsFilename, std::ios::trunc | std::ios::out | std::ios::in);
-
-    if (!buf)
+    // Go string by string
+    for (int finger = 0; finger < 6; ++finger)
     {
-        std::cerr << "Could not open file" << std::endl;
-        return 1;
+        // If the string is player
+        if (shape.fingers[finger] >= 0)
+        {
+            acum += shape.fingers[finger];
+            ++count;
+        }
     }
 
-    buf.seekg(0, std::ios::beg);
+    // The centroid is the average of the frets in the string played
+    if (count)
+        shape.centroid = acum / count;
+}
+
+void MinimumHandMovement::printChord(Chord chord)
+{
+    std::cout << chord.name << std::endl;
+
+    for (int shape = 0; shape < 3; ++shape)
+    {
+        std::cout << "shape" << shape << ": ";
+        for (int finger = 0; finger < 6; ++finger)
+            std::cout << chord.chordShapes[shape].fingers[finger] << ", ";
+
+        std::cout << "centroide: " << chord.chordShapes[shape].centroid << std::endl;
+    }
+}
+
+int MinimumHandMovement::parseFile(std::string chordsFilename)
+{
+    std::ifstream buf ("/Users/luisalvarezc/Desktop/positions.csv");
+
+    if (!buf)
+        return std::cerr << "Could not open file" << std::endl, 1;
 
     while (buf)
     {
-        Chord chord;
-
+        // Get the data of one chord
+        std::string line;
         std::getline(buf, line);
 
-        //----parsear linea---//
+        Chord chord;
 
+        // Variables to parse the line
+        size_t pos = line.find(",");
+        std::string token;
+
+        // Get the name of the chord
+        token = line.substr(0, pos);
+        chord.name = token;
+        line.erase(0, pos + 1); pos = line.find(",");
+
+        // Get the data of the three shapes of the chord
+        for (int curr_shape = 0; curr_shape < 3; ++curr_shape)
+        {
+            ChordShape shape;
+
+            // Get the offset
+            token = line.substr(0, pos);
+
+            // If there's offset insert it. Else, insert 0
+            shape.offset = (token.length()) ? std::stoi(token) : 0;
+            line.erase(0, pos + 1); pos = line.find(",");
+
+            // Get each of the fingers in the chord
+            for (int finger = 0; finger < 6; ++finger)
+            {
+                token = line.substr(0, pos);
+
+                // If the string is played, insert in which fret. Else, insert -1
+                shape.fingers[finger] = (token.length()) ? std::stoi(token) : -1;
+                line.erase(0, pos + 1); pos = line.find(",");
+
+                std::cout << line << std::endl;
+            }
+
+            // Add the shape to the shapes vector
+            chord.chordShapes.push_back(shape);
+        }
+
+        // Add the chord to the chords vector
         this->chords.push_back(chord);
     }
 
@@ -39,7 +101,7 @@ int MinimumHandMovement::parseFile(std::string chordsFilename, std::string songF
 
 double MinimumHandMovement::FASE(int i, double dacum)
 {
-     if (i >= n)
+    if (i >= n)
         return dacum;
 
     double dmin = std::numeric_limits<double>::max();
@@ -61,8 +123,11 @@ double MinimumHandMovement::FASE(int i, double dacum)
     return dmin;
 }
 
-double MinimumHandMovement::calculateMinimumHandMovement(std::string songFilename, std::string chordsfilename)
+double MinimumHandMovement::calculateMinimumHandMovement(std::string songFilename, std::string chordsFilename)
 {
-    parseFile(songFilename, chordsfilename);
+    parseFile(chordsFilename);
+
+    printChord(this->chords[0]);
+
     return 0.0;
 }
