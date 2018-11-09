@@ -37,9 +37,9 @@ void MinimumHandMovement::printChord(Chord chord)
     }
 }
 
-int MinimumHandMovement::parseFile(std::string chordsFilename)
+int MinimumHandMovement::parseChordsFile(std::string chordsFilename)
 {
-    std::ifstream buf ("/Users/luisalvarezc/Desktop/positions.csv");
+    std::ifstream buf (chordsFilename);
 
     if (!buf)
         return std::cerr << "Could not open file" << std::endl, 1;
@@ -85,13 +85,54 @@ int MinimumHandMovement::parseFile(std::string chordsFilename)
                 std::cout << line << std::endl;
             }
 
+            // Calls the method to calculate the centroid of each chordshape
+            calculateCentroid(shape);
+
             // Add the shape to the shapes vector
             chord.chordShapes.push_back(shape);
         }
 
         // Add the chord to the chords vector
-        this->chords.push_back(chord);
+        this->allChords.push_back(chord);
     }
+
+    // Close the file
+    buf.close();
+
+    return 0;
+}
+
+int MinimumHandMovement::parseSongFile(std::string songFilename)
+{
+    std::ifstream buf (songFilename);
+
+    if (!buf)
+        return std::cerr << "Could not open file" << std::endl, 1;
+
+    // Store just the name of each chord played in the song
+    std::vector<std::string> chordNames;
+
+    while (buf)
+    {
+        std::string line;
+        std::getline(buf, line);
+        if (line.length())
+            chordNames.push_back(line);
+    }
+
+    for(unsigned long chordName = 0; chordName < chordNames.size(); ++chordName)
+    {
+        for (unsigned long chord = 0; chord < this->allChords.size(); ++chord)
+        {
+            if (chordNames[chordName] == this->allChords[chord].name)
+            {
+                this->songChords.push_back(this->allChords[chord]);
+                chord = this->allChords.size();
+            }
+        }
+    }
+
+    std::cout << this->songChords.size() << std::endl;
 
     // Close the file
     buf.close();
@@ -110,7 +151,7 @@ double MinimumHandMovement::FASE(int i, double dacum)
     for (int j = 0; j < 3; ++j)
     {
         sigma[i] = j;
-        double d = FASE(i+1, dacum + abs(chords[i - 1].chordShapes[sigma[i - 1]].centroid - chords[i].chordShapes[j].centroid));
+        double d = FASE(i+1, dacum + abs(songChords[i - 1].chordShapes[sigma[i - 1]].centroid - songChords[i].chordShapes[j].centroid));
 
         if (d < dmin)
         {
@@ -123,11 +164,12 @@ double MinimumHandMovement::FASE(int i, double dacum)
     return dmin;
 }
 
-double MinimumHandMovement::calculateMinimumHandMovement(std::string songFilename, std::string chordsFilename)
+double MinimumHandMovement::calculateMinimumHandMovement(std::string chordsFilename, std::string songFilename)
 {
-    parseFile(chordsFilename);
+    //parseChordsFile(chordsFilename);
+    parseSongFile(songFilename);
 
-    printChord(this->chords[0]);
+    //printChord(this->chords[0]);
 
     return 0.0;
 }

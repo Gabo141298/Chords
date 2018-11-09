@@ -23,18 +23,20 @@ class MinimumHandMovement
         std::vector<ChordShape> chordShapes;
     };
 
-    std::vector<Chord> chords;
+    std::vector<Chord> allChords;
+    std::vector<Chord> songChords;
     std::vector<int> sigma;
     int n;
 
   private:
     double FASE(int i, double dacum);
-    int parseFile(std::string chordsFilename);
+    int parseChordsFile(std::string chordsFilename);
+    int parseSongFile(std::string songFilename);
     void printChord(Chord chord);
     void calculateCentroid(ChordShape shape);
 
   public:
-    double calculateMinimumHandMovement(std::string songFilename, std::string chordsFilename);
+    double calculateMinimumHandMovement(std::string chordsFilename, std::string songFilename);
 };
 
 #endif // MINIMUMHANDMOVEMENT_H
