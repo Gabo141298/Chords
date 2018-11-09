@@ -1,5 +1,8 @@
 #include <cmath>
-#include <limits>
+#include <cfloat>
+#include <climits>
+#include <sstream>
+
 
 #include "minimumhandmovement.h"
 
@@ -21,6 +24,8 @@ void MinimumHandMovement::calculateCentroid(ChordShape shape)
     // The centroid is the average of the frets in the string played
     if (count)
         shape.centroid = acum / count;
+    else
+        shape.centroid = DBL_MAX;
 }
 
 void MinimumHandMovement::printChord(Chord chord)
@@ -50,16 +55,15 @@ int MinimumHandMovement::parseChordsFile(std::string chordsFilename)
         std::string line;
         std::getline(buf, line);
 
-        Chord chord;
-
-        // Variables to parse the line
-        size_t pos = line.find(",");
+        // To parse the file
+        std::istringstream ss(line);
         std::string token;
 
+        Chord chord;
+
         // Get the name of the chord
-        token = line.substr(0, pos);
+        getline(ss,token,',');
         chord.name = token;
-        line.erase(0, pos + 1); pos = line.find(",");
 
         // Get the data of the three shapes of the chord
         for (int curr_shape = 0; curr_shape < 3; ++curr_shape)
@@ -67,22 +71,19 @@ int MinimumHandMovement::parseChordsFile(std::string chordsFilename)
             ChordShape shape;
 
             // Get the offset
-            token = line.substr(0, pos);
+            getline(ss,token,',');
 
             // If there's offset insert it. Else, insert 0
             shape.offset = (token.length()) ? std::stoi(token) : 0;
-            line.erase(0, pos + 1); pos = line.find(",");
 
             // Get each of the fingers in the chord
             for (int finger = 0; finger < 6; ++finger)
             {
-                token = line.substr(0, pos);
+                // Get the fret pressed in the string
+                getline(ss,token,',');
 
                 // If the string is played, insert in which fret. Else, insert -1
                 shape.fingers[finger] = (token.length()) ? std::stoi(token) : -1;
-                line.erase(0, pos + 1); pos = line.find(",");
-
-                std::cout << line << std::endl;
             }
 
             // Calls the method to calculate the centroid of each chordshape
@@ -166,7 +167,7 @@ double MinimumHandMovement::FASE(int i, double dacum)
 
 double MinimumHandMovement::calculateMinimumHandMovement(std::string chordsFilename, std::string songFilename)
 {
-    //parseChordsFile(chordsFilename);
+    parseChordsFile(chordsFilename);
     parseSongFile(songFilename);
 
     //printChord(this->chords[0]);
