@@ -17,7 +17,9 @@ void MinimumHandMovement::calculateCentroid(ChordShape& shape)
         // If the string is played
         if (shape.fingers[finger] >= 0)
         {
-            acum += shape.fingers[finger] + (shape.fingers[finger] > 0 ? shape.offset : 0);
+            acum += shape.fingers[finger];
+            if(shape.offset > 1.0)
+                acum += shape.offset - 1.0;
             ++count;
         }
     }
@@ -121,6 +123,8 @@ int MinimumHandMovement::parseChordsFile(std::string chordsFilename)
     return 0;
 }
 
+#define TESTING_SONG 1
+
 int MinimumHandMovement::parseSongFile(std::string songFilename)
 {
     std::ifstream buf (songFilename);
@@ -128,11 +132,11 @@ int MinimumHandMovement::parseSongFile(std::string songFilename)
     if (!buf)
         return std::cerr << "Could not open file" << std::endl, 1;
 
-    while (buf)
+    while (!buf.eof())
     {
         std::string line;
         std::getline(buf, line);
-        if (line.length())
+        if (line.length() && !isspace(line[0]))
         {
             std::map<std::string, Chord>::iterator itr = allChords.find(line);
             if(itr != allChords.end())
@@ -181,6 +185,8 @@ double MinimumHandMovement::fase(size_t i, double dacum)
     sigma = sigmaMin;
     return dmin;
 }
+
+#define TESTING_CHORDS 1
 
 double MinimumHandMovement::calculateMinimumHandMovement(std::string chordsFilename, std::string songFilename)
 {
