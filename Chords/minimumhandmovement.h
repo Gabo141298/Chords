@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <string>
 #include <vector>
 
@@ -23,17 +24,17 @@ class MinimumHandMovement
         std::vector<ChordShape> chordShapes;
     };
 
-    std::vector<Chord> allChords;
+    std::map<std::string, Chord> allChords;
     std::vector<Chord> songChords;
     std::vector<int> sigma;
-    int n;
+    size_t n;
 
   private:
-    double FASE(int i, double dacum);
+    double fase(size_t i, double dacum);
     int parseChordsFile(std::string chordsFilename);
     int parseSongFile(std::string songFilename);
-    void printChord(Chord chord);
-    void calculateCentroid(ChordShape shape);
+    void printChord(const Chord& chord);
+    void calculateCentroid(ChordShape& shape);
 
   public:
     double calculateMinimumHandMovement(std::string chordsFilename, std::string songFilename);
