@@ -17,9 +17,7 @@ void MinimumHandMovement::calculateCentroid(ChordShape& shape)
         // If the string is played
         if (shape.fingers[finger] >= 0)
         {
-            acum += shape.fingers[finger];
-            if(shape.offset > 1.0)
-                acum += shape.offset - 1.0;
+            acum += shape.fingers[finger] + shape.offset - 1.0;
             ++count;
         }
     }
@@ -82,7 +80,7 @@ int MinimumHandMovement::parseChordsFile(std::string chordsFilename)
             std::cout << token;
 #endif
             // If there's offset insert it. Else, insert 0
-            shape.offset = (token.length()) ? std::stoi(token) : 0;
+            shape.offset = (token.length()) ? std::stoi(token) : 1;
 
             // Get each of the fingers in the chord
             for (int finger = 0; finger < 6; ++finger)

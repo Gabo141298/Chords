@@ -14,7 +14,7 @@ class MinimumHandMovement
     {
         double centroid = 0.0;
         int fingers[6];
-        int offset;
+        int offset = 1;
     };
 
     class Chord
