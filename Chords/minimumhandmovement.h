@@ -31,6 +31,7 @@ class MinimumHandMovement
 
   private:
     double fase(size_t i, double dacum);
+    double dynamicMinimumHandMovement();
     int parseChordsFile(std::string chordsFilename);
     int parseSongFile(std::string songFilename);
     void printChord(const Chord& chord);

@@ -184,7 +184,59 @@ double MinimumHandMovement::fase(size_t i, double dacum)
     return dmin;
 }
 
-#define TESTING_CHORDS 1
+double MinimumHandMovement::dynamicMinimumHandMovement()
+{
+    std::vector<std::vector<double>> f;
+    std::vector<std::vector<int>> sigmaM;
+    f.resize(sigma.size());
+    sigmaM.resize(sigma.size());
+    for(size_t index = 0; index < f.size(); ++index)
+    {
+        f[index].resize(songChords[index].chordShapes.size());
+        sigmaM[index].resize(songChords[index].chordShapes.size());
+    }
+
+    for(size_t index = 0; index < sigmaM[sigmaM.size() - 1].size(); ++index)
+        sigmaM[sigmaM.size() - 1][index] = 0;
+
+    for(long row = f.size() - 2; row >= 0; --row)
+    {
+        for(size_t col = 0; col < f[row].size(); ++col)
+        {
+            f[row][col] = std::numeric_limits<double>::max();
+            size_t prevRow = row + 1;
+            for(size_t prevCol = 0; prevCol < f[prevRow].size(); ++prevCol)
+            {
+                double temp = f[prevRow][prevCol] +
+                        fabs(songChords[row].chordShapes[col].centroid - songChords[prevRow].chordShapes[prevCol].centroid);
+                if(temp < f[row][col])
+                {
+                    f[row][col] = temp;
+                    sigmaM[row][col] = prevCol;
+                }
+            }
+        }
+    }
+    double min = f[0][0];
+    sigma[0] = 0;
+    for(size_t index = 1; index < f[0].size(); ++index)
+    {
+        if(f[0][index] < min)
+        {
+            min = f[0][index];
+            sigma[0] = index;
+        }
+    }
+    int j = sigma[0];
+    for(size_t index = 1; index < sigma.size(); ++index)
+    {
+        sigma[index] = sigmaM[index - 1][sigma[index - 1]];
+    }
+
+    return min;
+}
+
+#define TESTING_CHORDS 0
 
 double MinimumHandMovement::calculateMinimumHandMovement(std::string chordsFilename, std::string songFilename)
 {
@@ -195,7 +247,13 @@ double MinimumHandMovement::calculateMinimumHandMovement(std::string chordsFilen
         printChord(songChords[index]);
 #endif
 
-    std::cout << fase(0, 0.0) << ": ";
+//    std::cout << "Búsqueda exhaustiva: " << fase(0, 0.0) << ": ";
+
+//    for(size_t index = 0; index < sigma.size(); ++index)
+//        std::cout << ' ' << sigma[index] + 1;
+//    std::cout << std::endl;
+
+    std::cout << "Programación dinámica: " << dynamicMinimumHandMovement() << ": ";
 
     for(size_t index = 0; index < sigma.size(); ++index)
         std::cout << ' ' << sigma[index] + 1;
