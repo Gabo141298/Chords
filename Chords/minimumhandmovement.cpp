@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cfloat>
 #include <limits>
+#include <iomanip>
 #include <sstream>
 
 
@@ -56,7 +57,7 @@ int MinimumHandMovement::parseChordsFile(std::string chordsFilename)
         std::string line;
         std::getline(buf, line);
 
-        // To parse the file
+        // Variables to read from the file
         std::istringstream ss(line);
         std::string token;
 
@@ -64,9 +65,7 @@ int MinimumHandMovement::parseChordsFile(std::string chordsFilename)
 
         // Get the name of the chord
         getline(ss,token,',');
-#if TESTING_CSV_PARSER
-        std::cout << token << std::endl;
-#endif
+
         chord.name = token;
 
         // Get the data of the three shapes of the chord
@@ -76,9 +75,7 @@ int MinimumHandMovement::parseChordsFile(std::string chordsFilename)
 
             // Get the offset
             getline(ss,token,',');
-#if TESTING_CSV_PARSER
-            std::cout << token;
-#endif
+
             // If there's offset insert it. Else, insert 0
             shape.offset = (token.length()) ? std::stoi(token) : 1;
 
@@ -87,9 +84,7 @@ int MinimumHandMovement::parseChordsFile(std::string chordsFilename)
             {
                 // Get the fret pressed in the string
                 getline(ss,token,',');
-#if TESTING_CSV_PARSER
-                std::cout << ' ' << token;
-#endif
+
                 // If the string is played, insert in which fret. Else, insert -1
                 shape.fingers[finger] = (token.length()) && !isspace(token[0]) ? std::stoi(token) : -1;
             }
@@ -100,28 +95,18 @@ int MinimumHandMovement::parseChordsFile(std::string chordsFilename)
             // Add the shape to the shapes vector
             if(shape.centroid != DBL_MAX)
                 chord.chordShapes.push_back(shape);
-#if TESTING_CSV_PARSER
-            std::cout << std::endl;
-#endif
         }
 
         // Add the chord to the chords vector
         this->allChords.insert(std::pair<std::string, Chord>(chord.name,chord));
-#if TESTING_CSV_PARSER
-        std::cout << std::endl;
-#endif
     }
 
     // Close the file
     buf.close();
-#if TESTING_CSV_PARSER
-    std::cout << "Terminé de leer el csv\n";
-#endif
 
     return 0;
 }
 
-#define TESTING_SONG 1
 
 int MinimumHandMovement::parseSongFile(std::string songFilename)
 {
@@ -142,9 +127,6 @@ int MinimumHandMovement::parseSongFile(std::string songFilename)
         }
     }
 
-#if TESTING_SONG
-    std::cout << this->songChords.size() << std::endl;
-#endif
     sigma.resize(songChords.size());
 
     // Close the file
@@ -175,9 +157,6 @@ double MinimumHandMovement::fase(size_t i, double dacum)
             dmin = d;
             sigmaMin = sigma;
         }
-#if TESTING_FASE
-        std::cout << i << ": " << d << std::endl;
-#endif
     }
 
     sigma = sigmaMin;
@@ -227,7 +206,7 @@ double MinimumHandMovement::dynamicMinimumHandMovement()
             sigma[0] = index;
         }
     }
-    int j = sigma[0];
+
     for(size_t index = 1; index < sigma.size(); ++index)
     {
         sigma[index] = sigmaM[index - 1][sigma[index - 1]];
@@ -236,28 +215,26 @@ double MinimumHandMovement::dynamicMinimumHandMovement()
     return min;
 }
 
-#define TESTING_CHORDS 0
-
 double MinimumHandMovement::calculateMinimumHandMovement(std::string chordsFilename, std::string songFilename)
 {
     parseChordsFile(chordsFilename);
     parseSongFile(songFilename);
-#if TESTING_CHORDS
-    for(size_t index = 0; index < songChords.size(); ++index)
-        printChord(songChords[index]);
+
+    double minimumHandMovement = 0;
+
+#if EXHAUSTIVE_SEARCH
+    minimumHandMovement = fase(0, 0.0);
 #endif
 
-//    std::cout << "Búsqueda exhaustiva: " << fase(0, 0.0) << ": ";
-
-//    for(size_t index = 0; index < sigma.size(); ++index)
-//        std::cout << ' ' << sigma[index] + 1;
-//    std::cout << std::endl;
-
-    std::cout << "Programación dinámica: " << dynamicMinimumHandMovement() << ": ";
+#if DYNAMIC_PROGRAMMING
+    minimumHandMovement = dynamicMinimumHandMovement();
+#endif
 
     for(size_t index = 0; index < sigma.size(); ++index)
-        std::cout << ' ' << sigma[index] + 1;
-    std::cout << std::endl;
+        std::cout << this->songChords[index].name << ":\t" << this->sigma[index] + 1 << '\n' << std::endl;
+
+    std::cout << "Total desplazamiento mínimo de la mano: " << minimumHandMovement << std::endl;
+    std::cout << "Desplazamiento promedio por acorde: " << minimumHandMovement / this->songChords.size() << std::endl;
 
     return 0.0;
 }
