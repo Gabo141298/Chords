@@ -33,16 +33,20 @@ class MinimumHandMovement
 
   private:
     /**
-     * @brief Recursive method that works as the exhaustive search algorithm
+     * @brief Recursive method that works as the exhaustive search algorithm.
      * @param i The index of the current chord
      * @param dacum The accumulated amount of hand movement bewteen chords
-     * @details
+     * @details The algorithm seeks all possible solutions from i=0,1,...,n-1.
+     * To do this, the function calls itself using each of the i-th chord shapes and adding to the accumulation the difference between the centroid of that chord shape and the previous chord given the shape selected in sigma[i-1].
+     * It also uses a vector to save the state of sigma that got the minimum hand movement required between all the shapes of the i-th chord.
      */
-    double fase(size_t i, double dacum);
+    double phase(size_t i, double dacum);
 
     /**
-     * @brief Algorithm to solve the hand movement problem using Dynamic Programming
-     * @details
+     * @brief Algorithm to solve the hand movement problem using Dynamic Programming.
+     * @details The algorithm fills a matrix F used to know the minimum hand movement required from chords i to n given a shape j of that i-th chord.
+     * Along that matrix, the algorithm also fills a matrix Sigma used to mark the way to get the minimum required hand movement.
+     * Sigma[i][j] says which shape of chord i+1 helps to achieve the minimum hand movement required.
      */
     double dynamicMinimumHandMovement();
 

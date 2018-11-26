@@ -25,7 +25,7 @@ void MinimumHandMovement::calculateCentroid(ChordShape& shape)
 
     // The centroid is the average of the frets in the string played
     if (count)
-        shape.centroid = (double)acum / count;
+        shape.centroid = static_cast<double>(acum) / count;
     else
         shape.centroid = DBL_MAX;
 }
@@ -135,7 +135,7 @@ int MinimumHandMovement::parseSongFile(std::string songFilename)
     return 0;
 }
 
-double MinimumHandMovement::fase(size_t i, double dacum)
+double MinimumHandMovement::phase(size_t i, double dacum)
 {
     if (i >= songChords.size())
         return dacum;
@@ -148,9 +148,9 @@ double MinimumHandMovement::fase(size_t i, double dacum)
         sigma[i] = j;
         double d = 0.0;
         if(i > 0)
-            d = fase(i+1, dacum + fabs((double)(songChords[i - 1].chordShapes[sigma[i - 1]].centroid - songChords[i].chordShapes[j].centroid)));
+            d = phase(i+1, dacum + fabs(static_cast<double>(songChords[i - 1].chordShapes[sigma[i - 1]].centroid - songChords[i].chordShapes[j].centroid)));
         else
-            d = fase(i+1, 0.0);
+            d = phase(i+1, 0.0);
 
         if (d < dmin)
         {
